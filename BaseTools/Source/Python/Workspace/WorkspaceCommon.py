@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
+from __future__ import annotations
 from __future__ import absolute_import
 from collections import OrderedDict, defaultdict
 from Common.DataType import SUP_MODULE_USER_DEFINED
@@ -16,6 +17,8 @@ from Common.BuildToolError import RESOURCE_NOT_AVAILABLE
 from Common.BuildToolError import OPTION_MISSING
 from Common.BuildToolError import BUILD_ERROR
 import Common.EdkLogger as EdkLogger
+
+# from .DscBuildData import DscBuildData  # Ray: circular import
 
 class OrderedListDict(OrderedDict):
     def __init__(self, *args, **kwargs):
@@ -35,15 +38,23 @@ class OrderedListDict(OrderedDict):
 #  @param Toolchain: Current toolchain
 #  @retval: List of packages which are DecBuildData instances
 #
-def GetPackageList(Platform, BuildDatabase, Arch, Target, Toolchain):
+def GetPackageList(Platform : DscBuildData, BuildDatabase : WorkspaceDatabase.BuildObjectFactory, Arch, Target, Toolchain):
     PkgSet = set()
     if Platform.Packages:
-        PkgSet.update(Platform.Packages)
-    for ModuleFile in Platform.Modules:
-        Data = BuildDatabase[ModuleFile, Arch, Target, Toolchain]
+        PkgSet.update(Platform.Packages)  # Ray: set[DecBuildData]
+
+    after_pkg = len(PkgSet) # Ray:
+
+    for ModuleFile in Platform.Modules:  # Ray: for key in OrderedDict[PathClass, ModuleBuildClassObject]
+        Data = BuildDatabase[ModuleFile, Arch, Target, Toolchain] # Ray: InfBuildData
         PkgSet.update(Data.Packages)
         for Lib in GetLibraryInstances(Data, Platform, BuildDatabase, Arch, Target, Toolchain):
             PkgSet.update(Lib.Packages)
+    
+    print("RAY> [GetPackageList] after Platform.Packages %s" % after_pkg);
+    print("RAY> [GetPackageList] after Platform.Modules %s" % len(PkgSet));            
+    print("RAY> [GetPackageList] return \n%s " % "\n".join([x.MetaFile.Path for x in PkgSet]))  # Ray: PlatformBuildClassObject | 
+    print("RAY> [GetPackageList]")
     return list(PkgSet)
 
 ## Get all declared PCD from platform for specified arch, target and toolchain

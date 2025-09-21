@@ -64,9 +64,21 @@ class DebugMacroCheckBuildPlugin(IUefiBuildPlugin):
                 builder.env.GetValue("ACTIVE_PLATFORM")
             )
         )
+        
+        act_plat = builder.env.GetValue("ACTIVE_PLATFORM")
+        abs_plat_path = builder.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath(act_plat)
+        abs_pkg_path =  edk2.GetAbsolutePathOnThisSystemFromEdk2RelativePath(package)
+        logging.debug(f"RAY> edk2 {edk2}" )
+        logging.debug(f"RAY> act_plat {act_plat}" )
+        logging.debug(f"RAY> abs_plat_path {abs_plat_path}" )
+        logging.debug(f"RAY> Package {package}" )
+        logging.debug(f"RAY> abs_pkg_path {abs_pkg_path}" )  # error is this path
+
         package_path = Path(
                           edk2.GetAbsolutePathOnThisSystemFromEdk2RelativePath(
                                 package))
+
+        logging.debug(f"RAY> package_path {package_path}" )
 
         # Every debug macro is printed at DEBUG logging level.
         # Ensure the level is above DEBUG while executing the macro check

@@ -26,6 +26,8 @@ import subprocess
 import tempfile
 from collections import OrderedDict
 
+import traceback  # Ray:
+
 import Common.LongFilePathOs as os
 from Common import EdkLogger as EdkLogger
 from Common import GlobalData as GlobalData
@@ -1445,9 +1447,17 @@ class PathClass(object):
             self.Root = str(Root)
             self.AlterRoot = str(AlterRoot)
 
+        print("RAY> k 5")
+        print()
+        #if os.path.splitext(File)[1].lower == ".dsc":
+        traceback.print_stack(None, 5, sys.stdout)
+        print("RAY> [PathClass.__init__] self.File before = %s " % self.File)
+        print("RAY> [PathClass.__init__] self.Root before = %s " % self.Root)
+
         # Remove any '.' and '..' in path
         if self.Root:
             self.Root = mws.getWs(self.Root, self.File)
+            print("RAY> [PathClass.__init__] self.Root after mws.getWs = %s " % self.Root)
             self.Path = os.path.normpath(os.path.join(self.Root, self.File))
             self.Root = os.path.normpath(CommonPath([self.Root, self.Path]))
             # eliminate the side-effect of 'C:'
@@ -1460,6 +1470,10 @@ class PathClass(object):
                 self.File = self.Path[len(self.Root) + 1:]
         else:
             self.Path = os.path.normpath(self.File)
+
+        #if os.path.splitext(File)[1].lower == ".dsc":
+        print("RAY> [PathClass.__init__] self.Root final = %s " % self.Root)
+        print("RAY> [PathClass.__init__] self.Path final = %s " % self.Path)
 
         self.SubDir, self.Name = os.path.split(self.File)
         self.BaseName, self.Ext = os.path.splitext(self.Name)

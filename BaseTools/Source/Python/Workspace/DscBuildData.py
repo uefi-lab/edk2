@@ -14,6 +14,7 @@
 #
 from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import annotations
 from Common.StringUtils import *
 from Common.DataType import *
 from Common.Misc import *
@@ -42,6 +43,10 @@ import json
 import os
 import shutil
 import sys
+
+from .DecBuildData import DecBuildData
+from .InfBuildData import InfBuildData
+#from .WorkspaceDatabase import WorkspaceDatabase  # Ray: circular import
 
 def _IsFieldValueAnArray (Value):
     Value = Value.strip()
@@ -223,7 +228,12 @@ class DscBuildData(PlatformBuildClassObject):
     #   @param      Platform        (not used for DscBuildData)
     #   @param      Macros          Macros used for replacement in DSC file
     #
-    def __init__(self, FilePath, RawData, BuildDataBase, Arch=TAB_ARCH_COMMON, Target=None, Toolchain=None):
+    def __init__(self, FilePath, RawData, BuildDataBase : WorkspaceDatabase.BuildObjectFactory, Arch=TAB_ARCH_COMMON, Target=None, Toolchain=None):
+        print("RAY>")
+        print("RAY> k 5")
+        traceback.print_stack(None, 5, sys.stdout)
+        print("RAY> [DscBuildData.__init__]")
+
         self.MetaFile = FilePath
         self._RawData = RawData
         self._Bdb = BuildDataBase
@@ -725,7 +735,7 @@ class DscBuildData(PlatformBuildClassObject):
 
     ## Retrieve packages this Platform depends on
     @cached_property
-    def Packages(self):
+    def Packages(self) -> set[DecBuildData]:
         RetVal = set()
         RecordList = self._RawData[MODEL_META_DATA_PACKAGE, self._Arch]
         Macros = self._Macros
@@ -742,7 +752,7 @@ class DscBuildData(PlatformBuildClassObject):
 
     ## Retrieve [Components] section information
     @property
-    def Modules(self):
+    def Modules(self) -> OrderedDict[PathClass, ModuleBuildClassObject]:
         if self._Modules is not None:
             return self._Modules
         self.OverrideDuplicateModule()
@@ -760,7 +770,7 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=LineNo,
                                 ExtraData=ErrorInfo)
 
-            ModuleBuildData = self._Bdb[ModuleFile, self._Arch, self._Target, self._Toolchain]
+            ModuleBuildData : InfBuildData = self._Bdb[ModuleFile, self._Arch, self._Target, self._Toolchain]
             Module = ModuleBuildClassObject()
             Module.MetaFile = ModuleFile
             Module.Guid = ModuleBuildData.Guid

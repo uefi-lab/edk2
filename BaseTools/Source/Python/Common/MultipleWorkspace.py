@@ -106,10 +106,14 @@ class MultipleWorkspace(object):
     def getWs(cls, Ws, Path):
         absPath = os.path.join(Ws, Path)
         if not os.path.exists(absPath):
+            print("RAY> [getWs] searching PACKAGES_PATH: %s" % cls.PACKAGES_PATH)
             for Pkg in cls.PACKAGES_PATH:
                 absPath = os.path.join(Pkg, Path)
                 if os.path.exists(absPath):
+                    print("RAY> [getWs] selected : '%s'" % Pkg)
                     return Pkg
+        else:
+            print("RAY> [getWs] using (original parent): '%s'" % Ws)
         return Ws
 
     ## handleWsMacro()

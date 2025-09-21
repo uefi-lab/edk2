@@ -707,6 +707,8 @@ class Build():
         self.WorkspaceDir   = WorkspaceDir
         self.Target         = Target
         self.PlatformFile   = BuildOptions.PlatformFile
+        print("RAY> [Build.__init__] DSC arg = %s " % self.PlatformFile)
+
         self.ModuleFile     = BuildOptions.ModuleFile
         self.ArchList       = BuildOptions.TargetArch
         self.ToolChainList  = BuildOptions.ToolChain
@@ -954,6 +956,8 @@ class Build():
             if self.ToolChainList is None or len(self.ToolChainList) == 0:
                 EdkLogger.error("build", RESOURCE_NOT_AVAILABLE, ExtraData="No toolchain given. Don't know how to build.\n")
 
+        print("RAY> [Build.LoadConfiguration] DSC before = %s " % self.PlatformFile)
+
         if not self.PlatformFile:
             PlatformFile = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_ACTIVE_PLATFORM]
             if not PlatformFile:
@@ -971,6 +975,8 @@ class Build():
                                     ExtraData="No active platform specified in target.txt or command line! Nothing can be built.\n")
 
             self.PlatformFile = PathClass(NormFile(PlatformFile, self.WorkspaceDir), self.WorkspaceDir)
+
+        print("RAY> [Build.LoadConfiguration] DSC after = %s " % self.PlatformFile)
 
         self.GetToolChainAndFamilyFromDsc (self.PlatformFile)
 
@@ -2680,11 +2686,16 @@ def Main():
             if ErrorCode != 0:
                 EdkLogger.error("build", ErrorCode, ExtraData=ErrorInfo)
 
+        print("RAY> [Main] DSC arg before = %s " % Option.PlatformFile)
+
         if Option.PlatformFile is not None:
             if os.path.isabs (Option.PlatformFile):
                 if os.path.normcase (os.path.normpath(Option.PlatformFile)).find (os.path.normcase(Workspace)) == 0:
                     Option.PlatformFile = NormFile(os.path.normpath(Option.PlatformFile), Workspace)
+            print("RAY> [Main] DSC arg norm = %s " % Option.PlatformFile)
             Option.PlatformFile = PathClass(Option.PlatformFile, Workspace)
+
+        print("RAY> [Main] DSC arg after = %s " % Option.PlatformFile)
 
         if Option.FdfFile is not None:
             if os.path.isabs (Option.FdfFile):

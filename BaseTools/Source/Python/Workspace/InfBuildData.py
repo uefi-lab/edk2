@@ -16,6 +16,8 @@ from collections import OrderedDict
 from Workspace.BuildClassObject import ModuleBuildClassObject, LibraryClassObject, PcdClassObject
 from Common.Expression import ValueExpressionEx, PcdPattern
 
+from .DecBuildData import DecBuildData
+
 ## Get Protocol value from given packages
 #
 #   @param      CName           The CName of the GUID
@@ -683,7 +685,7 @@ class InfBuildData(ModuleBuildClassObject):
 
     ## Retrieve packages this module depends on
     @cached_property
-    def Packages(self):
+    def Packages(self) -> set[DecBuildData]:
         RetVal = []
         RecordList = self._RawData[MODEL_META_DATA_PACKAGE, self._Arch, self._Platform]
         Macros = self._Macros
